@@ -55,7 +55,7 @@ const CardBasic = ({ item }: Props) => {
                 {item.alunoAtivo ? item.alunoAtivo : 0}
               </Typography>
               <Typography sx={{textAlign: 'center'}}>
-                { item.titulo == "Alunos" ?
+                { item.titulo === "Alunos" ?
                   "Alunos Ativos": " A vencer"}
               </Typography>
             </CardContent>
@@ -70,7 +70,7 @@ const CardBasic = ({ item }: Props) => {
                 {item.alunoBloqueado ? item.alunoBloqueado : 0}
               </Typography>
               <Typography sx={{textAlign: 'center'}}>
-              { item.titulo == "Alunos" ?
+              { item.titulo === "Alunos" ?
                   "Alunos bloqueados": "Vencidos"}
                 
               </Typography>

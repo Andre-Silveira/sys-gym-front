@@ -15,6 +15,11 @@ const colorConfigs = {
   card: {
     main:"#fafafa",
     child: "#fff"
+  },
+  listaAlunos:{
+    bg: "#f9f9f9",
+    inputSearch: "#EAEAEAEA",
+    aluno: "#ECECEC"
   }
 };
 
