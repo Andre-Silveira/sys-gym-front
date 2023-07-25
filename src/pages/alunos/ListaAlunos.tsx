@@ -22,6 +22,7 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import App from "../../components/common/Dialog";
 import Title from "../../components/common/Title";
 import colorConfigs from "../../configs/colorConfigs";
+import { dialogAlunoBloquear, dialogAlunoDesbloquear } from "../../constants";
 import { buscarListaAlunos } from "../../util/Api";
 import { alunoType } from "./CadastroAluno";
 
@@ -92,10 +93,10 @@ const ListaAlunos = () => {
                           <EditIcon />
                         </IconButton>
                         <IconButton sx={{margin: 1}} edge="end">
-                          <App icone={<LockIcon />} />
+                          <App icone={<LockIcon />} texto={dialogAlunoBloquear}/>
                         </IconButton>
                         <IconButton sx={{margin: 1}} edge="end">
-                          <App icone={<LockOpenIcon />}  />
+                          <App icone={<LockOpenIcon />} texto={dialogAlunoDesbloquear} />
                         </IconButton>
                       </div>
                     }

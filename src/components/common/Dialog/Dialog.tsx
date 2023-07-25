@@ -21,13 +21,8 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const DialogAlert  = () => {
+const DialogAlert = ({title, body}: any) => {
   const [alertState, setAlertState] = useContext<any>(DialogContext);
-  const [open, setOpen] = React.useState(false);
-
-  const handleClickOpen = () => {
-    setAlertState(true);
-  };
 
   const handleClose = () => {
     setAlertState(false);
@@ -42,16 +37,15 @@ const DialogAlert  = () => {
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>{"Use Google's location service?"}</DialogTitle>
+        <DialogTitle>{title}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            Let Google help apps determine location. This means sending anonymous
-            location data to Google, even when no apps are running.
+            {body}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Disagree</Button>
-          <Button onClick={handleClose}>Agree</Button>
+          <Button onClick={handleClose}>Cancelar</Button>
+          <Button onClick={handleClose}>Confirmar</Button>
         </DialogActions>
       </Dialog>
     </div>
