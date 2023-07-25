@@ -1,26 +1,44 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
 import EditIcon from "@mui/icons-material/Edit";
-import LockIcon from "@mui/icons-material/Lock";
-import LockOpenIcon from "@mui/icons-material/LockOpen";
 import SearchIcon from "@mui/icons-material/Search";
-import { Button, Card, CardActions, CardContent, Divider, IconButton, InputBase, List, ListItem, ListItemText } from "@mui/material";
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Divider,
+  IconButton,
+  InputBase,
+  List,
+  ListItem,
+  ListItemText
+} from "@mui/material";
 import Paper from "@mui/material/Paper";
 
-import React from "react";
-import { Link } from "react-router-dom";
+import LockIcon from '@mui/icons-material/Lock';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+import App from "../../components/common/Dialog";
 import Title from "../../components/common/Title";
 import colorConfigs from "../../configs/colorConfigs";
+import { buscarListaAlunos } from "../../util/Api";
+import { alunoType } from "./CadastroAluno";
 
-type Props = {};
+const ListaAlunos = () => {
 
-function generate(element: React.ReactElement) {
-  return [0, 1, 2].map((value) =>
-    React.cloneElement(element, {
-      key: value,
-    }),
-  );
-}
+  const [listaAluno, setListaAluno] = useState<Array<alunoType>>([])
 
-const ListaAlunos = (props: Props) => {
+  useEffect(() => {
+    buscarListaAlunos()
+      .then(({data}) => {
+        setListaAluno(data)
+      })
+      .catch((erro) => {
+        console.error(erro)
+      })
+  })
+
   return (
     <div>
       <Title titulo={"Alunos"} />
@@ -61,7 +79,7 @@ const ListaAlunos = (props: Props) => {
               }}
             >
               <List>
-                {generate(
+                {listaAluno.map((item) =>
                   <ListItem
                     secondaryAction={
                       <div>
@@ -74,16 +92,16 @@ const ListaAlunos = (props: Props) => {
                           <EditIcon />
                         </IconButton>
                         <IconButton sx={{margin: 1}} edge="end">
-                          <LockIcon />
+                          <App icone={<LockIcon />} />
                         </IconButton>
                         <IconButton sx={{margin: 1}} edge="end">
-                          <LockOpenIcon />
+                          <App icone={<LockOpenIcon />}  />
                         </IconButton>
                       </div>
                     }
                   >
                     <ListItemText
-                      primary="Nome do aluno"
+                      primary={item.nome}
                     />
                   </ListItem>
                 )}

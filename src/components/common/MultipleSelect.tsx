@@ -1,12 +1,12 @@
 
+import { Typography } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
 import ListItemText from '@mui/material/ListItemText';
 import MenuItem from '@mui/material/MenuItem';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import Select from '@mui/material/Select';
 import * as React from 'react';
+import colorConfigs from '../../configs/colorConfigs';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -15,9 +15,22 @@ const MenuProps = {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
       width: 250,
+      disableUnderline: true
     },
   },
 };
+
+const inputConfig = {
+  ml: 1,
+  flex: 1,
+  borderRadius: '10px',
+  width: '100%',
+  marginLeft: '0',
+  border: 'none',
+  paddingLeft: 1,
+  marginTop: 1,
+  backgroundColor: colorConfigs.listaAlunos.inputSearch
+}
 
 type tipo = {
   id: number
@@ -101,17 +114,21 @@ const MultipleSelect = () => {
 
   return (
     <div>
-      <FormControl sx={{ m: 1, width: 300 }}>
-        <InputLabel id="demo-multiple-checkbox-label">Tag</InputLabel>
+      <Typography sx={{ml: 1, flex: 1}}>
+        Aluas:
+      </Typography>
+      <FormControl sx={{ m: 1, width: '100%', marginTop: 0 }}>
         <Select
-          labelId="demo-multiple-checkbox-label"
-          id="demo-multiple-checkbox"
+          labelId="multipleSelect-label"
+          id="multipleSelect"
           multiple
+          variant='standard'
+          sx={inputConfig}
           value={variantName}
           onChange={handleChange}
-          input={<OutlinedInput label="Tag" />}
           renderValue={(selected) => selected.map((x) => x.name).join(', ')}
           MenuProps={MenuProps}
+          disableUnderline
         >
           {variants.map((variant) => (
             <MenuItem key={variant.id} value={variant}>

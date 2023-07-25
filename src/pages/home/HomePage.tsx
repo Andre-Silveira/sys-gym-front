@@ -1,8 +1,11 @@
 import { Grid } from '@mui/material';
+import { useEffect } from 'react';
 import CardBasic, { CardType } from '../../components/common/Card';
 import Title from '../../components/common/Title';
+import { buscarListaAlunos } from '../../util/Api';
+import { alunoType } from '../alunos/CadastroAluno';
 
-const itemAluno: CardType = {
+let itemAluno: CardType = {
   titulo: "Alunos"
 }
 const itemTreino: CardType = {
@@ -10,6 +13,22 @@ const itemTreino: CardType = {
 }
 
 const HomePage = () => {
+
+  useEffect(() => {
+    buscarListaAlunos()
+      .then(({data}) => {
+        
+        const alunosAtivos = data.filter((aluno: alunoType) => aluno.ativo)     
+        const alunosDesativos = data.filter((aluno: alunoType) => !aluno.ativo)     
+        
+        itemAluno.alunoAtivo = alunosAtivos.length
+        itemAluno.alunoBloqueado = alunosDesativos.length
+      })
+      .catch((erro) => {
+        console.error(erro.response.data)
+      })
+  })
+
   return (
     <div>
       <Title titulo={"Dashboard"} />
