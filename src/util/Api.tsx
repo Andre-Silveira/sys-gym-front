@@ -14,6 +14,10 @@ export function atualizarAluno() {
   return axios.get(`${API_Base}/listaAluno`);
 }
 
-export function ativarDesativarAluno() {
-  return axios.get(`${API_Base}/listaAluno`);
+export function ativarAlunoApi(idAluno: number) {
+  return axios.get(`${API_Base}/ativarAluno/${idAluno}`);
+}
+
+export function desativarAlunoApi(idAluno: number) {
+  return axios.get(`${API_Base}/desativarAluno/${idAluno}`);
 }

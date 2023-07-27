@@ -1,5 +1,5 @@
 import { Box, Button, Grid, InputBase, TextField, Typography } from '@mui/material';
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 // @ts-ignore
 //import CurrencyInput from 'react-currency-masked-input';
 import { Link } from 'react-router-dom';
@@ -27,12 +27,27 @@ const inputConfigPequeno = {
   backgroundColor: colorConfigs.listaAlunos.inputSearch
 }
 
-const FormAluno = () => {
-  const [valorMensal, setValorMensal] = React.useState<Number>(12345.42)
+const FormAluno = ({aluno}: any) => {
+  const [valorMensal, setValorMensal] = useState<Number>(0)
+  //const aluno:alunoType = item;
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValorMensal(Number(event.target.value));
   };
+
+  useEffect(() => {
+    calculaValorMensal()
+  })
+  
+  const calculaValorMensal = () => {
+    if (aluno != null) {
+      let valor = 0
+      aluno.aula.map((res:any) =>{
+        valor = valor + res.mensalidade;
+      })
+      setValorMensal(valor)
+    }
+  }
 
   return (
     <form>
@@ -43,6 +58,7 @@ const FormAluno = () => {
       </Typography>
       <InputBase
         sx={inputConfigGrande}
+        value={aluno?.nome || null}
       />
       <Grid sx={{ marginTop: 2 }} direction={'row'} container>
         <div style={{ marginRight: '7%', width: '44%' }}>
@@ -51,6 +67,7 @@ const FormAluno = () => {
           </Typography>
           <InputBase
             sx={inputConfigPequeno}
+            value={aluno?.cpf || null}
           />
         </div>
         <div style={{ width: '44%' }}>
@@ -59,6 +76,7 @@ const FormAluno = () => {
           </Typography>
           <InputBase
             sx={inputConfigPequeno}
+            value={aluno?.email || null}
           />
         </div>
       </Grid>
@@ -67,6 +85,7 @@ const FormAluno = () => {
       </Typography>
       <InputBase
         sx={inputConfigGrande}
+        value={aluno?.endereco || null}
       />
       <Grid sx={{ marginTop: 2 }} direction={'row'} container>
         <div style={{ marginRight: '7%', width: '44%' }}>
@@ -75,6 +94,7 @@ const FormAluno = () => {
           </Typography>
           <InputBase
             sx={inputConfigPequeno}
+            value={aluno?.dataNascimento || null}
           />
         </div>
         <div style={{ width: '44%' }}>
@@ -83,12 +103,13 @@ const FormAluno = () => {
           </Typography>
           <InputBase
             sx={inputConfigPequeno}
+            value={aluno?.telefone || null}
           />
         </div>
       </Grid>
       <Grid sx={{ marginTop: 2 }} direction={'row'} container>
         <div style={{ marginRight: '7%', width: '44%' }}>
-          <MultipleSelect />
+          <MultipleSelect aulas={aluno?.aula} />
         </div>
         <div style={{ width: '44%' }}>
           <Typography sx={{ ml: 1, flex: 1 }}>

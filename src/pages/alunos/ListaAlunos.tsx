@@ -22,28 +22,20 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import App from "../../components/common/Dialog";
 import Title from "../../components/common/Title";
 import colorConfigs from "../../configs/colorConfigs";
-import { dialogAlunoBloquear, dialogAlunoDesbloquear } from "../../constants";
-import { buscarListaAlunos } from "../../util/Api";
+import { dadosAluno, dialogAlunoBloquear, dialogAlunoDesbloquear } from "../../constants";
 import { alunoType } from "./CadastroAluno";
 
 const ListaAlunos = () => {
 
-  const [listaAluno, setListaAluno] = useState<Array<alunoType>>([])
+  const [alunoList, setAlunoSlist] = useState<alunoType[]>([]);
 
   useEffect(() => {
-    buscarListaAlunos()
-      .then(({data}) => {
-        setListaAluno(data)
-      })
-      .catch((erro) => {
-        console.error(erro)
-      })
-  })
-
+    setAlunoSlist(dadosAluno);
+  }, [])
   return (
     <div>
       <Title titulo={"Alunos"} />
-      <Card sx={{backgroundColor: colorConfigs.listaAlunos.bg, padding: 0}}>
+      <Card sx={{ backgroundColor: colorConfigs.listaAlunos.bg, padding: 0 }}>
         <CardContent>
           <div>
             <Paper
@@ -80,32 +72,47 @@ const ListaAlunos = () => {
               }}
             >
               <List>
-                {listaAluno.map((item) =>
-                  <ListItem
-                    secondaryAction={
-                      <div>
-                        <IconButton
-                          sx={{margin: 1}}
-                          edge="end"
-                          component={Link}
-                          to="/editarAlunos"
-                        >
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton sx={{margin: 1}} edge="end">
-                          <App icone={<LockIcon />} texto={dialogAlunoBloquear}/>
-                        </IconButton>
-                        <IconButton sx={{margin: 1}} edge="end">
-                          <App icone={<LockOpenIcon />} texto={dialogAlunoDesbloquear} />
-                        </IconButton>
-                      </div>
-                    }
-                  >
-                    <ListItemText
-                      primary={item.nome}
-                    />
-                  </ListItem>
-                )}
+                {alunoList?.map((item: any) => {
+
+                  return (
+                    <ListItem
+                      key={Math.random()}
+                      secondaryAction={
+                        <div>
+                          <IconButton
+                            sx={{ margin: 1 }}
+                            edge="end"
+                            component={Link}
+                            to="/editarAlunos"
+                            state={{ aluno: item }}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton 
+                            sx={{ margin: 1 }}
+                            edge="end">
+                            <App
+                              icone={<LockIcon />}
+                              texto={dialogAlunoBloquear}
+                              idAluno={item.id}
+                            />
+                          </IconButton>
+                          <IconButton sx={{ margin: 1 }} edge="end">
+                            <App
+                              icone={<LockOpenIcon />}
+                              texto={dialogAlunoDesbloquear}
+                              idAluno={item.id}
+                            />
+                          </IconButton>
+                        </div>
+                      }
+                    >
+                      <ListItemText
+                        primary={item.nome}
+                      />
+                    </ListItem>
+                  )
+                })}
               </List>
             </div>
           </div>
@@ -115,7 +122,7 @@ const ListaAlunos = () => {
         style={{
           justifyContent: 'end',
           marginTop: 30
-          }}
+        }}
       >
         <Button
           variant="contained"
