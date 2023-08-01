@@ -29,25 +29,24 @@ const inputConfigPequeno = {
 
 const FormAluno = ({aluno}: any) => {
   const [valorMensal, setValorMensal] = useState<Number>(0)
-  //const aluno:alunoType = item;
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValorMensal(Number(event.target.value));
   };
 
+  const getValorMensal = (valor:Number) => {
+    setValorMensal(valor)
+  }
+
   useEffect(() => {
-    calculaValorMensal()
-  })
-  
-  const calculaValorMensal = () => {
     if (aluno != null) {
       let valor = 0
-      aluno.aula.map((res:any) =>{
+      aluno.aula.map((res:any) => {
         valor = valor + res.mensalidade;
       })
       setValorMensal(valor)
     }
-  }
+  }, [aluno])
 
   return (
     <form>
@@ -109,7 +108,7 @@ const FormAluno = ({aluno}: any) => {
       </Grid>
       <Grid sx={{ marginTop: 2 }} direction={'row'} container>
         <div style={{ marginRight: '7%', width: '44%' }}>
-          <MultipleSelect aulas={aluno?.aula} />
+          <MultipleSelect aulas={aluno?.aula} valorMensalidade={getValorMensal} />
         </div>
         <div style={{ width: '44%' }}>
           <Typography sx={{ ml: 1, flex: 1 }}>
