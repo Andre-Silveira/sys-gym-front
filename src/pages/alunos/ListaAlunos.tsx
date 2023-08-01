@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import EditIcon from "@mui/icons-material/Edit";
+import LockIcon from '@mui/icons-material/Lock';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 import SearchIcon from "@mui/icons-material/Search";
 import {
   Button,
@@ -13,21 +15,27 @@ import {
   InputBase,
   List,
   ListItem,
-  ListItemText
+  ListItemText,
+  Typography
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
-
-import LockIcon from '@mui/icons-material/Lock';
-import LockOpenIcon from '@mui/icons-material/LockOpen';
+import { makeStyles } from '@mui/styles';
 import App from "../../components/common/Dialog";
 import Title from "../../components/common/Title";
 import colorConfigs from "../../configs/colorConfigs";
 import { dadosAluno, dialogAlunoBloquear, dialogAlunoDesbloquear } from "../../constants";
 import { alunoType } from "./CadastroAluno";
 
+const useStyles:any = makeStyles ({
+  selected: {
+    background: "#750000"
+  },
+});
+
 const ListaAlunos = () => {
 
   const [alunoList, setAlunoSlist] = useState<alunoType[]>([]);
+  const classes = useStyles();
 
   useEffect(() => {
     setAlunoSlist(dadosAluno);
@@ -76,6 +84,7 @@ const ListaAlunos = () => {
 
                   return (
                     <ListItem
+                      className={ item.ativo ? null : classes.selected }
                       key={Math.random()}
                       secondaryAction={
                         <div>
@@ -88,7 +97,8 @@ const ListaAlunos = () => {
                           >
                             <EditIcon />
                           </IconButton>
-                          <IconButton 
+                          <IconButton
+                            disabled = { item.ativo ? false : true }
                             sx={{ margin: 1 }}
                             edge="end">
                             <App
@@ -97,7 +107,11 @@ const ListaAlunos = () => {
                               idAluno={item.id}
                             />
                           </IconButton>
-                          <IconButton sx={{ margin: 1 }} edge="end">
+                          <IconButton
+                            disabled = { item.ativo ? true : false }
+                            sx={{ margin: 1 }}
+                            edge="end"
+                          >
                             <App
                               icone={<LockOpenIcon />}
                               texto={dialogAlunoDesbloquear}
@@ -108,7 +122,7 @@ const ListaAlunos = () => {
                       }
                     >
                       <ListItemText
-                        primary={item.nome}
+                        primary={<Typography variant="subtitle1">{item.nome}</Typography>}
                       />
                     </ListItem>
                   )
