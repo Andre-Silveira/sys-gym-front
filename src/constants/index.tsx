@@ -35,8 +35,7 @@ export const dadosAluno: alunoType[] = [
         mensalidade: 15.75
       }
     ],
-    "mensalidade": 0,
-    "dataNascimento": new Date(),
+    "dataNascimento": new Date("2022-03-24"),
     "ativo": true
   },
   {
@@ -53,8 +52,7 @@ export const dadosAluno: alunoType[] = [
         mensalidade: 10
       }
     ],
-    "mensalidade": 0,
-    "dataNascimento": new Date(),
+    "dataNascimento": new Date("1992-05-05"),
     "ativo": false
   },
   {
@@ -71,8 +69,7 @@ export const dadosAluno: alunoType[] = [
         mensalidade: 10
       }
     ],
-    "mensalidade": 0,
-    "dataNascimento": new Date(),
+    "dataNascimento": new Date("1992-12-16"),
     "ativo": true
   },
   {
@@ -89,8 +86,7 @@ export const dadosAluno: alunoType[] = [
         mensalidade: 10
       }
     ],
-    "mensalidade": 0,
-    "dataNascimento": new Date(),
+    "dataNascimento": new Date("2000-05-05"),
     "ativo": true
   },
   {
@@ -107,8 +103,12 @@ export const dadosAluno: alunoType[] = [
         mensalidade: 10
       }
     ],
-    "mensalidade": 0,
-    "dataNascimento": new Date(),
+    "dataNascimento": new Date("2001-05-05"),
     "ativo": true
   }
 ]
+
+export const schemaAlunoValidation = {
+  require: "O campo é obrigatório!",
+  minValue: "Não existe a quantidade necessária de caracteres"
+}
