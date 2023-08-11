@@ -1,12 +1,8 @@
 import axios from "axios";
 import { alunoType } from "../pages/alunos/CadastroAluno";
 
-//  axios.defaults.baseURL = "https://projeto-integrado-sys-gym-production.up.railway.app"
- axios.defaults.baseURL = "http://localhost:5026";
-// axios.defaults.headers.get['Content-Type'] ='application/json;charset=utf-8';
-// axios.defaults.headers.get['Access-Control-Allow-Origin'] = true;
-// axios.defaults.headers.get["Accept"] = "*/*";
-// axios.defaults.headers.get['Access-Control-Allow-Headers'] = "Origin, X-Requested-With, Content-Type, Accept";
+ axios.defaults.baseURL = "https://projeto-integrado-sys-gym-production.up.railway.app"
+//  axios.defaults.baseURL = "http://localhost:5026";
 
 export function buscarListaAlunos() {
   return  axios.get(`/api/Pessoas/ListarAlunos/`,);
