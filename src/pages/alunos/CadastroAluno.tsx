@@ -16,7 +16,7 @@ export type alunoType = {
 
 export type aulaType = {
   id?: number
-  aula: string,
+  nome: string,
   mensalidade: number
 }
 

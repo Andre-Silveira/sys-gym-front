@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { Box, Button, Grid, TextField, Typography } from '@mui/material';
+import { Box, Button, Grid, Snackbar, TextField, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -12,18 +11,22 @@ import { Field, Form, Formik } from 'formik';
 import InputMask from 'react-input-mask';
 
 import dayjs from 'dayjs';
+import { useNavigate } from 'react-router-dom';
 import colorConfigs from '../../configs/colorConfigs';
 import inputConfig from '../../configs/inputConfigs';
 import { alunoType, aulaType } from '../../pages/alunos/CadastroAluno';
 import AlunoValidation from '../../pages/alunos/ValidationShemaAluno';
-import { atualizarAluno } from '../../util/Api';
+import { atualizarAluno, criarAluno } from '../../util/Api';
 import Currency from './Currency';
 import MultipleSelect from './MultipleSelect';
 
 const FormAluno = ({aluno}: any) => {
   const [valorMensal, setValorMensal] = useState<Number>(0)
-  const [dataNasc, setDataNasc] = useState<Date>(new Date());
+  const [alertAberto, setAlertAberto] = useState(false)
+  const [alertAbertoError, setAlertAbertoError] = useState(false)
   const [exibeFormulario, setExibeFormilario] = useState(true);
+  const [mensagemAlert, setMensagemAlert] = useState('');
+  const navigate = useNavigate()
   const [listaAulaSelecionada, setListaAulaSelecionada] = useState<Array<aulaType>>([])
   const [dadosAluno, setDadosAluno] = useState<alunoType>({
     id: undefined || aluno?.id,
@@ -32,21 +35,19 @@ const FormAluno = ({aluno}: any) => {
     aula: [
       {
         id: undefined,
-        aula: "",
+        nome: "",
         mensalidade: 0
       }
     ] || aluno?.aula,
     cpf: "" || aluno?.cpf,
-    dataNascimento: "" || aluno?.dataNascimento,
+    dataNascimento: aluno?.dataNascimento || new Date(),
     email: "" || aluno?.email,
     endereco: "" || aluno?.endereco,
     telefone: "" || aluno?.telefone
   })
 
   useEffect(() => {
-    if (aluno != null) {
-      console.log(aluno);
-      
+    if (aluno != null) {      
       setExibeFormilario(false);
       setDadosAluno({
         ativo: aluno.ativo,
@@ -67,7 +68,7 @@ const FormAluno = ({aluno}: any) => {
       setValorMensal(valor)
       setExibeFormilario(true);
     }
-  }, [])
+  }, [aluno])
 
   const getAulas = (aulasSelecionadas:any) => {
     const aulas:Array<aulaType> = aulasSelecionadas;
@@ -81,39 +82,55 @@ const FormAluno = ({aluno}: any) => {
 
   const salvarFormulario = (dados:any) => {
     let alunoParaSalvar:alunoType = dados;
-    if (aluno === null ){
+    if (listaAulaSelecionada.length > 0 ){
       alunoParaSalvar.aula = listaAulaSelecionada;
-      alunoParaSalvar.dataNascimento = dataNasc
     }
-    console.log(alunoParaSalvar);
 
     if (alunoParaSalvar.id !== undefined) {
       atualizarAluno(alunoParaSalvar).then(()=>{
-        return (
-          <Alert severity="success">
-            <AlertTitle>Cadastro Atualizado</AlertTitle>
-            O cadastro do aluno {alunoParaSalvar.nome} foi atualizado
-          </Alert>
-        )
+        setAlertAberto(true)
+        navigate("/alunos");
+        setMensagemAlert(`O Aluno ${alunoParaSalvar.nome} foi atualizado com sucesso!`)
       }).catch((e) => {
-        console.error(e);
-        return (
-          <Alert severity="error">
-            <AlertTitle>Erro ao atualizar</AlertTitle>
-            O cadastro do aluno {alunoParaSalvar.nome} não foi atualizado devido a um erro
-          </Alert>
-        )
+        console.error('erro update', e.message);
+        setAlertAbertoError(true)
+        setMensagemAlert(`Erro ${e.message} ao atualizar o aluno ${alunoParaSalvar.nome}`)
       })
       
     } else {
-      //salvar
-      console.log("salvar");
-      
+      alunoParaSalvar.ativo = true;
+      criarAluno(alunoParaSalvar).then(()=>{
+        setAlertAberto(true)
+        navigate("/alunos");
+        setMensagemAlert(`O Aluno ${alunoParaSalvar.nome} foi salvo com sucesso!`)
+      }).catch((e) => {
+        console.error('erro salvar ', e.message);
+        setAlertAbertoError(true)
+        setMensagemAlert(`Erro ${e.message} ao salvar o aluno ${alunoParaSalvar.nome}`)
+      })
     }
   }
 
   return (
     <div>
+      <Snackbar
+        sx={{width: '60%'}}
+        open={alertAberto || alertAbertoError}
+        autoHideDuration={6000}
+        onClose={() => {
+          setAlertAberto(false);
+          setAlertAbertoError(false)
+        }}>
+        <Alert
+          onClose={() => {
+            setAlertAberto(false);
+            setAlertAbertoError(false)}
+          }
+          severity={alertAberto ? "success" : "error"}
+          sx={{ width: '100%' }}>
+            {mensagemAlert}
+        </Alert>
+      </Snackbar>
       {exibeFormulario ? (
         <Formik
           initialValues={dadosAluno}
@@ -208,6 +225,7 @@ const FormAluno = ({aluno}: any) => {
                 >
                   <Field
                     name='dataNascimento'
+                    type='date'
                   >
                     {({ field }: any) => (
                       <DemoContainer sx={{ padding: 0}} components={["DateTimePicker"]}>
@@ -223,6 +241,12 @@ const FormAluno = ({aluno}: any) => {
                     )}
                   </Field>
                 </LocalizationProvider>
+                {errors.dataNascimento && touched.dataNascimento ? (
+                  <div style={inputConfig.errorText}>
+                    <p/>
+                    *O aluno precisa de ter pelo menos 16 anos
+                  </div>
+                ) : null}
               </div>
               <div style={{ width: '44%' }}>
                 <Typography sx={{ ml: 1, flex: 1 }}>
@@ -304,10 +328,6 @@ const FormAluno = ({aluno}: any) => {
               <Button
                 type='submit'
                 variant="contained"
-                onClick={() => {
-                  console.log(errors);
-                  
-                }}
                 sx={{
                   backgroundColor: colorConfigs.title,
                   color: "#fff",

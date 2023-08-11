@@ -1,8 +1,8 @@
 import { Grid } from '@mui/material';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import CardBasic, { CardType } from '../../components/common/Card';
 import Title from '../../components/common/Title';
-import { dadosAluno } from '../../constants';
+import { buscarListaAlunos } from '../../util/Api';
 import { alunoType } from '../alunos/CadastroAluno';
 
 let itemAluno: CardType = {
@@ -13,45 +13,40 @@ const itemTreino: CardType = {
 }
 
 const HomePage = () => {  
-
-  const alunosAtivos = dadosAluno.filter((aluno: alunoType) => aluno.ativo)     
-  const alunosDesativos = dadosAluno.filter((aluno: alunoType) => !aluno.ativo)     
-  
-  itemAluno.alunoAtivo = alunosAtivos.length
-  itemAluno.alunoBloqueado = alunosDesativos.length
+  const [exibirCard, setExibirCard] = useState(false)
   useEffect(() => {
-    // buscarListaAlunos()
-    //   .then(({data}) => {
+    buscarListaAlunos()
+      .then(({data}) => {        
+        const alunosAtivos = data.filter((aluno: alunoType) => aluno.ativo)     
+        const alunosDesativos = data.filter((aluno: alunoType) => !aluno.ativo)     
         
-    //     const alunosAtivos = data.filter((aluno: alunoType) => aluno.ativo)     
-    //     const alunosDesativos = data.filter((aluno: alunoType) => !aluno.ativo)     
-        
-    //     itemAluno.alunoAtivo = alunosAtivos.length
-    //     itemAluno.alunoBloqueado = alunosDesativos.length
+        itemAluno.alunoAtivo = alunosAtivos.length
+        itemAluno.alunoBloqueado = alunosDesativos.length
 
-    //     setAlunoList(data);
-    //   })
-    //   .catch((erro) => {
-    //     console.error(erro.response.data)
-    //   })
-  })
+        setExibirCard(true)
+        
+      })
+      .catch((erro) => {
+        console.error(erro)
+      })
+  }, [])
 
   return (
     <div>
-      <Title titulo={"Dashboard"} />
-      <Grid
+      {exibirCard && <><Title titulo={"Dashboard"} /><Grid
         container
         direction={"row"}
         spacing={2}
         style={{
-          marginLeft: '4px'}}>
-        <div style={{marginRight: '5%', width: '45%'}}>
+          marginLeft: '4px'
+        }}>
+        <div style={{ marginRight: '5%', width: '45%' }}>
           <CardBasic item={itemAluno} />
         </div>
-        <div style={{width: '45%'}}>
+        <div style={{ width: '45%' }}>
           <CardBasic item={itemTreino} />
         </div>
-      </Grid>
+      </Grid></>}
     </div>
   );
 };

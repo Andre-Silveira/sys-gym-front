@@ -23,7 +23,8 @@ import { makeStyles } from '@mui/styles';
 import App from "../../components/common/Dialog";
 import Title from "../../components/common/Title";
 import colorConfigs from "../../configs/colorConfigs";
-import { dadosAluno, dialogAlunoBloquear, dialogAlunoDesbloquear } from "../../constants";
+import { dialogAlunoBloquear, dialogAlunoDesbloquear } from "../../constants";
+import { buscarListaAlunos } from "../../util/Api";
 import { alunoType } from "./CadastroAluno";
 
 const useStyles:any = makeStyles ({
@@ -38,8 +39,19 @@ const ListaAlunos = () => {
   const classes = useStyles();
 
   useEffect(() => {
-    setAlunoSlist(dadosAluno);
+    buscarListaAlunos()
+      .then(({data}) => {              
+        setAlunoSlist(data);
+      })
+      .catch((erro) => {
+        console.error(erro)
+      })
   }, [])
+
+  const getListAlunos = (novaListaAlunos:any) => {    
+    setAlunoSlist(novaListaAlunos)
+  }
+
   return (
     <div>
       <Title titulo={"Alunos"} />
@@ -105,6 +117,7 @@ const ListaAlunos = () => {
                               icone={<LockIcon />}
                               texto={dialogAlunoBloquear}
                               idAluno={item.id}
+                              setListAlunos={getListAlunos}
                             />
                           </IconButton>
                           <IconButton
@@ -116,6 +129,7 @@ const ListaAlunos = () => {
                               icone={<LockOpenIcon />}
                               texto={dialogAlunoDesbloquear}
                               idAluno={item.id}
+                              setListAlunos={getListAlunos}
                             />
                           </IconButton>
                         </div>

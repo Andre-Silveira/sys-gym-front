@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -12,7 +12,7 @@ import { TransitionProps } from '@mui/material/transitions';
 
 import { DialogContext } from '.';
 import { dialogAlunoDesbloquear } from '../../../constants';
-import { ativarAlunoApi, desativarAlunoApi } from '../../../util/Api';
+import { ativarAlunoApi, buscarListaAlunos, desativarAlunoApi } from '../../../util/Api';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -23,26 +23,20 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const DialogAlert = ({title, body, idAluno}:any) => {
+const DialogAlert = ({title, body, idAluno, setlistaAlunos}:any) => {
   const [alertState, setAlertState] = useContext<any>(DialogContext);
 
   const handleClose = () => {
     setAlertState(false);
   };
-
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    if (alertState){
-      title === dialogAlunoDesbloquear.title ?
-        ativarAluno() : desativarAluno();
-    }
-  })
   
   const ativarAluno = () => {
     ativarAlunoApi(idAluno)
       .then(() => {
-        console.log("pronto");
-        
+        buscarListaAlunos()
+          .then(({ data }) => {
+            setlistaAlunos(data)
+          })
       })
       .catch((erro) => {
         console.error(erro.response.data)
@@ -52,8 +46,10 @@ const DialogAlert = ({title, body, idAluno}:any) => {
   const desativarAluno = () => {
     desativarAlunoApi(idAluno)
       .then(() => {
-        console.log("pronto");
-        
+        buscarListaAlunos()
+          .then(({ data }) => {
+            setlistaAlunos(data)
+          })
       })
       .catch((erro) => {
         console.error(erro.response.data)
@@ -76,7 +72,11 @@ const DialogAlert = ({title, body, idAluno}:any) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancelar</Button>
-          <Button onClick={() => setAlertState(false)}>Confirmar</Button>
+          <Button onClick={() => {
+            title === dialogAlunoDesbloquear.title ?
+              ativarAluno() : desativarAluno();
+            handleClose()
+          }}>Confirmar</Button>
         </DialogActions>
       </Dialog>
     </div>

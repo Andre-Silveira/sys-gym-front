@@ -7,6 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { useEffect, useState } from 'react';
 import { aulaType } from '../../pages/alunos/CadastroAluno';
+import { buscarAulas } from '../../util/Api';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -20,24 +21,9 @@ const MenuProps = {
   },
 };
 
-
-const variants: Array<any> = [
-  {
-    aula: "musculação",
-    mensalidade: 10
-  },
-  {
-    aula: "natação",
-    mensalidade: 12.5
-  },
-  {
-    aula: "luta",
-    mensalidade: 15.75
-  }
-];
-
 const MultipleSelect = ({ aulas, arrayAulasSelecionadas, formatacao }: any) => {
   const [listaAulas, setListaAulas] = useState<any>([]);
+  const [listaAulasSelecionada, setListaAulasSelecionada] = useState<any>([]);
 
   const indexOfAll = (arr:any, val:any) => arr.reduce((acc:any, el:any, i:any) => (el === val ? [...acc, i] : acc), []);
   
@@ -48,7 +34,7 @@ const MultipleSelect = ({ aulas, arrayAulasSelecionadas, formatacao }: any) => {
     const idsaulasSelecionadas:Array<[]> = [];
     
     aulasSelecionadas.forEach((item:any) => {
-      idsaulasSelecionadas.push(aulasSelecionadas.findIndex((res:any) => res.aula === item.aula));  
+      idsaulasSelecionadas.push(aulasSelecionadas.findIndex((res:any) => res.nome === item.nome));  
     });
     
     const unico:any = idsaulasSelecionadas.filter((item:any, index:any) => idsaulasSelecionadas.indexOf(item) !== index);
@@ -62,19 +48,29 @@ const MultipleSelect = ({ aulas, arrayAulasSelecionadas, formatacao }: any) => {
     
     aulasSelecionadas.map((aula:aulaType) =>  valorMensal += aula.mensalidade)
     arrayAulasSelecionadas(aulasSelecionadas)
-    setListaAulas(aulasSelecionadas)    
+    setListaAulasSelecionada(aulasSelecionadas)    
   };
   
   useEffect(() => {
     if (aulas){
-      setListaAulas(aulas)
+      setListaAulasSelecionada(aulas)
     }    
   }, [aulas])
+
+  useEffect(() => {
+    buscarAulas()
+      .then(({ data }) => {
+        setListaAulas(data)        
+      })
+      .catch((error) => {
+        console.error(error);
+      }) 
+  }, [])
 
   return (
     <div>
       <Typography sx={{ ml: 1, flex: 1 }}>
-        Aluas:
+        Aulas:
       </Typography>
       <FormControl sx={{ m: 1, width: '100%', marginTop: 0 }}>
         <Select
@@ -83,24 +79,24 @@ const MultipleSelect = ({ aulas, arrayAulasSelecionadas, formatacao }: any) => {
           multiple
           variant='standard'
           sx={formatacao}
-          value={listaAulas}
+          value={listaAulasSelecionada}
           onChange={(e) => {
-            setListaAulas(e.target.value)
+            setListaAulasSelecionada(e.target.value)
             handleChange(e.target.value)}
           }
-          renderValue={(selected) => selected.map((x:any) => x.aula).join(', ')}
+          renderValue={(selected) => selected.map((x:any) => x.nome).join(', ')}
           MenuProps={MenuProps}
           disableUnderline
         >
-          {variants.map((variant) => (
-            <MenuItem key={variant.aula} value={variant}>
+          {listaAulas.map((aula:any) => (
+            <MenuItem key={aula.nome} value={aula}>
               <Checkbox
-                key={variant.aula + '1'}
+                key={aula.nome + '1'}
                 checked={
-                  listaAulas.findIndex((item:any) => item.aula === variant.aula) >= 0
+                  listaAulasSelecionada.findIndex((item:any) => item.nome === aula.nome) >= 0
                 }
               />
-              <ListItemText key={variant.aula +'2'} primary={variant.aula} />
+              <ListItemText key={aula.nome +'2'} primary={aula.nome} />
             </MenuItem>
           ))}
         </Select>

@@ -15,6 +15,8 @@ const AlunoValidation = Yup.object().shape({
     .required(schemaAlunoValidation.require),
   endereco: Yup.string()
     .required(schemaAlunoValidation.require),
+  dataNascimento: Yup.date()
+    .max(new Date().getFullYear() - 16, schemaAlunoValidation.minValue),
   aula: Yup.array()
     .of(
       Yup.object().shape({
