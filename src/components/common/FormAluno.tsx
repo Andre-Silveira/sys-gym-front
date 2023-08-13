@@ -20,7 +20,7 @@ import { atualizarAluno, criarAluno } from '../../util/Api';
 import Currency from './Currency';
 import MultipleSelect from './MultipleSelect';
 
-const FormAluno = ({aluno}: any) => {
+const FormAluno = ({ aluno }: any) => {
   const [valorMensal, setValorMensal] = useState<Number>(0)
   const [alertAberto, setAlertAberto] = useState(false)
   const [alertAbertoError, setAlertAbertoError] = useState(false)
@@ -47,7 +47,7 @@ const FormAluno = ({aluno}: any) => {
   })
 
   useEffect(() => {
-    if (aluno != null) {      
+    if (aluno != null) {
       setExibeFormilario(false);
       setDadosAluno({
         ativo: aluno.ativo,
@@ -62,7 +62,7 @@ const FormAluno = ({aluno}: any) => {
       })
       let valor = 0
       // eslint-disable-next-line array-callback-return
-      aluno.aula.map((res:any) => {
+      aluno.aula.map((res: any) => {
         valor = valor + res.mensalidade;
       })
       setValorMensal(valor)
@@ -70,43 +70,53 @@ const FormAluno = ({aluno}: any) => {
     }
   }, [aluno])
 
-  const getAulas = (aulasSelecionadas:any) => {
-    const aulas:Array<aulaType> = aulasSelecionadas;
+  const getAulas = (aulasSelecionadas: any) => {
+    const aulas: Array<aulaType> = aulasSelecionadas;
     let mensalidade = 0
-    
-    aulas.map((aula:aulaType) =>  mensalidade += aula.mensalidade)
+
+    aulas.map((aula: aulaType) => mensalidade += aula.mensalidade)
     setValorMensal(mensalidade)
     setListaAulaSelecionada(aulas);
-        
+
   }
 
-  const salvarFormulario = (dados:any) => {
-    let alunoParaSalvar:alunoType = dados;
-    if (listaAulaSelecionada.length > 0 ){
+  const salvarFormulario = (dados: any) => {
+    let alunoParaSalvar: alunoType = dados;
+    if (listaAulaSelecionada.length > 0) {
       alunoParaSalvar.aula = listaAulaSelecionada;
     }
 
     if (alunoParaSalvar.id !== undefined) {
-      atualizarAluno(alunoParaSalvar).then(()=>{
+      atualizarAluno(alunoParaSalvar).then(() => {
         setAlertAberto(true)
         navigate("/alunos");
         setMensagemAlert(`O Aluno ${alunoParaSalvar.nome} foi atualizado com sucesso!`)
       }).catch((e) => {
         console.error('erro update', e.message);
+        console.log(e.response.data.message);
+
         setAlertAbertoError(true)
-        setMensagemAlert(`Erro ${e.message} ao atualizar o aluno ${alunoParaSalvar.nome}`)
+        const errorMessage = e.response && e.response.data && e.response.data.message
+          ? e.response.data.message
+          : `Erro ${e.message} ao atualizar o aluno ${alunoParaSalvar.nome}`;
+
+        setMensagemAlert(errorMessage);
       })
-      
+
     } else {
       alunoParaSalvar.ativo = true;
-      criarAluno(alunoParaSalvar).then(()=>{
+      criarAluno(alunoParaSalvar).then(() => {
         setAlertAberto(true)
         navigate("/alunos");
         setMensagemAlert(`O Aluno ${alunoParaSalvar.nome} foi salvo com sucesso!`)
       }).catch((e) => {
         console.error('erro salvar ', e.message);
         setAlertAbertoError(true)
-        setMensagemAlert(`Erro ${e.message} ao salvar o aluno ${alunoParaSalvar.nome}`)
+        const errorMessage = e.response && e.response.data && e.response.data.message
+          ? e.response.data.message
+          : `Erro ${e.message} ao salvar o aluno ${alunoParaSalvar.nome}`;
+
+        setMensagemAlert(errorMessage);
       })
     }
   }
@@ -114,7 +124,7 @@ const FormAluno = ({aluno}: any) => {
   return (
     <div>
       <Snackbar
-        sx={{width: '60%'}}
+        sx={{ width: '60%' }}
         open={alertAberto || alertAbertoError}
         autoHideDuration={6000}
         onClose={() => {
@@ -124,223 +134,224 @@ const FormAluno = ({aluno}: any) => {
         <Alert
           onClose={() => {
             setAlertAberto(false);
-            setAlertAbertoError(false)}
+            setAlertAbertoError(false)
+          }
           }
           severity={alertAberto ? "success" : "error"}
           sx={{ width: '100%' }}>
-            {mensagemAlert}
+          {mensagemAlert}
         </Alert>
       </Snackbar>
       {exibeFormulario ? (
         <Formik
           initialValues={dadosAluno}
           validationSchema={AlunoValidation}
-          onSubmit={(values) => salvarFormulario(values) }
+          onSubmit={(values) => salvarFormulario(values)}
         >
-        {({ errors, touched, setFieldValue, isValid, values }) => (
-          <Form>
-            <Typography
-              sx={{ ml: 1, flex: 1 }}
-            >
-              Nome completo:
-            </Typography>
-            <Field
-              name='nome'
-              style={errors.nome && touched.nome ?
-                inputConfig.inputConfigGrandeError : inputConfig.inputConfigGrande}
-            />
-            {errors.nome && touched.nome ? (
-              <div style={inputConfig.errorText}>
-                <p/>
-                *{errors.nome}
-              </div>
-            ) : null}
-            <Grid sx={{ marginTop: 2 }} direction={'row'} container>
-              <div style={{ marginRight: '7%', width: '44%' }}>
-                <Typography sx={{ ml: 1, flex: 1 }}>
-                  CPF:
-                </Typography>
-                <Field
-                  name='cpf'
-                >
-                  {({ field }: any) => (
-                    <InputMask
-                      {...field}
-                      mask="999.999.999-99"
-                      type="text"
-                      style={errors.cpf && touched.cpf ?
-                        inputConfig.inputConfigPequenoMaskError : inputConfig.inputConfigPequenoMask}
-                    />
-                  )}
-                </Field>
-                {errors.cpf && touched.cpf ? (
-                  <div style={inputConfig.errorText}>
-                    <p/>
-                    *{errors.cpf}
-                  </div>
-                ) : null}
-              </div>
-              <div style={{ width: '44%' }}>
-                <Typography sx={{ ml: 1, flex: 1 }}>
-                  E-mail:
-                </Typography>
-                <Field
-                  type='email'
-                  name='email'
-                  style={errors.email && touched.email ?
-                    inputConfig.inputConfigPequenoMaskError : inputConfig.inputConfigPequenoMask}
-                />
-                {errors.email && touched.email ? (
-                  <div style={inputConfig.errorText}>
-                    <p/>
-                    *{errors.email}
-                  </div>
-                ) : null}
-              </div>
-            </Grid>
-            <Typography sx={{ ml: 1, flex: 1, marginTop: 2 }}>
-              Endereço:
-            </Typography>
-            <Field
-              name='endereco'
-              style={errors.endereco && touched.endereco ?
-                inputConfig.inputConfigGrandeError : inputConfig.inputConfigGrande}
-            />
-            {errors.endereco && touched.endereco ? (
-              <div style={inputConfig.errorText}>
-                <p/>
-                *{errors.endereco}
-              </div>
-            ) : null}
-            <Grid sx={{ marginTop: 2 }} direction={'row'} container>
-              <div style={{ marginRight: '7%', width: '44%' }}>
-                <Typography sx={{ ml: 1, flex: 1 }}>
-                  Data Nascimento:
-                </Typography>
-                <LocalizationProvider
-                  dateAdapter={AdapterDayjs}
-                  localeText={
-                    ptBR.components.MuiLocalizationProvider.defaultProps.localeText
-                  }
-                >
+          {({ errors, touched, setFieldValue, isValid, values }) => (
+            <Form>
+              <Typography
+                sx={{ ml: 1, flex: 1 }}
+              >
+                Nome completo:
+              </Typography>
+              <Field
+                name='nome'
+                style={errors.nome && touched.nome ?
+                  inputConfig.inputConfigGrandeError : inputConfig.inputConfigGrande}
+              />
+              {errors.nome && touched.nome ? (
+                <div style={inputConfig.errorText}>
+                  <p />
+                  *{errors.nome}
+                </div>
+              ) : null}
+              <Grid sx={{ marginTop: 2 }} direction={'row'} container>
+                <div style={{ marginRight: '7%', width: '44%' }}>
+                  <Typography sx={{ ml: 1, flex: 1 }}>
+                    CPF:
+                  </Typography>
                   <Field
-                    name='dataNascimento'
-                    type='date'
+                    name='cpf'
                   >
                     {({ field }: any) => (
-                      <DemoContainer sx={{ padding: 0}} components={["DateTimePicker"]}>
-                        <DateTimePicker
-                          {...field}
-                          value={dayjs(values.dataNascimento)}
-                          onChange={(e:any) => setFieldValue(field.name, dayjs(e).toDate())}
-                          sx={{ border: 0, padding: 0}}
-                          views={["year", "month", "day"]}
-                          format={"DD/MM/YYYY"}
-                        />
-                      </DemoContainer>
+                      <InputMask
+                        {...field}
+                        mask="999.999.999-99"
+                        type="text"
+                        style={errors.cpf && touched.cpf ?
+                          inputConfig.inputConfigPequenoMaskError : inputConfig.inputConfigPequenoMask}
+                      />
                     )}
                   </Field>
-                </LocalizationProvider>
-                {errors.dataNascimento && touched.dataNascimento ? (
-                  <div style={inputConfig.errorText}>
-                    <p/>
-                    *O aluno precisa de ter pelo menos 16 anos
-                  </div>
-                ) : null}
-              </div>
-              <div style={{ width: '44%' }}>
-                <Typography sx={{ ml: 1, flex: 1 }}>
-                  Telefone de contato:
-                </Typography>
-                <Field
-                  name='telefone'
-                  style={errors.telefone && touched.telefone ?
-                    inputConfig.inputConfigPequenoMaskError : inputConfig.inputConfigPequenoMask}
+                  {errors.cpf && touched.cpf ? (
+                    <div style={inputConfig.errorText}>
+                      <p />
+                      *{errors.cpf}
+                    </div>
+                  ) : null}
+                </div>
+                <div style={{ width: '44%' }}>
+                  <Typography sx={{ ml: 1, flex: 1 }}>
+                    E-mail:
+                  </Typography>
+                  <Field
+                    type='email'
+                    name='email'
+                    style={errors.email && touched.email ?
+                      inputConfig.inputConfigPequenoMaskError : inputConfig.inputConfigPequenoMask}
+                  />
+                  {errors.email && touched.email ? (
+                    <div style={inputConfig.errorText}>
+                      <p />
+                      *{errors.email}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+              <Typography sx={{ ml: 1, flex: 1, marginTop: 2 }}>
+                Endereço:
+              </Typography>
+              <Field
+                name='endereco'
+                style={errors.endereco && touched.endereco ?
+                  inputConfig.inputConfigGrandeError : inputConfig.inputConfigGrande}
+              />
+              {errors.endereco && touched.endereco ? (
+                <div style={inputConfig.errorText}>
+                  <p />
+                  *{errors.endereco}
+                </div>
+              ) : null}
+              <Grid sx={{ marginTop: 2 }} direction={'row'} container>
+                <div style={{ marginRight: '7%', width: '44%' }}>
+                  <Typography sx={{ ml: 1, flex: 1 }}>
+                    Data Nascimento:
+                  </Typography>
+                  <LocalizationProvider
+                    dateAdapter={AdapterDayjs}
+                    localeText={
+                      ptBR.components.MuiLocalizationProvider.defaultProps.localeText
+                    }
+                  >
+                    <Field
+                      name='dataNascimento'
+                      type='date'
+                    >
+                      {({ field }: any) => (
+                        <DemoContainer sx={{ padding: 0 }} components={["DateTimePicker"]}>
+                          <DateTimePicker
+                            {...field}
+                            value={dayjs(values.dataNascimento)}
+                            onChange={(e: any) => setFieldValue(field.name, dayjs(e).toDate())}
+                            sx={{ border: 0, padding: 0 }}
+                            views={["year", "month", "day"]}
+                            format={"DD/MM/YYYY"}
+                          />
+                        </DemoContainer>
+                      )}
+                    </Field>
+                  </LocalizationProvider>
+                  {errors.dataNascimento && touched.dataNascimento ? (
+                    <div style={inputConfig.errorText}>
+                      <p />
+                      *O aluno precisa de ter pelo menos 16 anos
+                    </div>
+                  ) : null}
+                </div>
+                <div style={{ width: '44%' }}>
+                  <Typography sx={{ ml: 1, flex: 1 }}>
+                    Telefone de contato:
+                  </Typography>
+                  <Field
+                    name='telefone'
+                    style={errors.telefone && touched.telefone ?
+                      inputConfig.inputConfigPequenoMaskError : inputConfig.inputConfigPequenoMask}
+                  >
+                    {({ field }: any) => (
+                      <InputMask
+                        {...field}
+                        mask="(99) 99999-9999"
+                        style={errors.telefone && touched.telefone ?
+                          inputConfig.inputConfigPequenoMaskError : inputConfig.inputConfigPequenoMask}
+                      />
+                    )}
+                  </Field>
+                  {errors.telefone && touched.telefone ? (
+                    <div style={inputConfig.errorText}>
+                      <p />
+                      *{errors.telefone}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+              <Grid sx={{ marginTop: 2 }} direction={'row'} container>
+                <div
+                  style={errors.aula && touched.aula ?
+                    { marginRight: '7%', width: '44%', borderColor: 'red', border: '1px' } :
+                    { marginRight: '7%', width: '44%' }}
                 >
-                  {({ field }: any) => (
-                    <InputMask
-                      {...field}
-                      mask="(99) 99999-9999"
-                      style={errors.telefone && touched.telefone ?
-                        inputConfig.inputConfigPequenoMaskError : inputConfig.inputConfigPequenoMask}
-                    />
-                  )}
-                </Field>
-                {errors.telefone && touched.telefone ? (
-                  <div style={inputConfig.errorText}>
-                    <p/>
-                    *{errors.telefone}
-                  </div>
-                ) : null}
-              </div>
-            </Grid>
-            <Grid sx={{ marginTop: 2 }} direction={'row'} container>
-              <div
-                style={errors.aula && touched.aula ? 
-                  { marginRight: '7%', width: '44%', borderColor: 'red', border: '1px' } :
-                  { marginRight: '7%', width: '44%' } }
-              >
-                <MultipleSelect
-                  formatacao={errors.aula && touched.aula ? inputConfig.selectError : inputConfig.select}
-                  aulas={aluno?.aula}
-                  arrayAulasSelecionadas={getAulas}
-                />
-                {errors.aula && touched.aula ? (
-                  <div style={inputConfig.errorText}>
-                    <p/>
-                    * Selecione um curso
-                  </div>
-                ) : null}
-              </div>
-              <div style={{ width: '44%' }}>
-                <Typography sx={{ ml: 1, flex: 1 }}>
-                  Valor da mensalidade:
-                </Typography>
-                <Field
-                  name='aula.0.mensalidade'
-                >
-                  {({ field }:any) =>  (
-                    <TextField
-                      {...field}
-                      value={valorMensal}
-                      onChange={() => setFieldValue(field.name, listaAulaSelecionada.at(0)?.mensalidade)}
-                      sx={inputConfig.inputConfigPequeno}
-                      name="numberformat"
-                      id="formatted-numberformat-input"
-                      InputProps={{
-                        inputComponent: Currency as any,
-                        disableUnderline: true
-                      }}
-                      variant="standard"
-                    />
-                  )}
-                </Field>
-              </div>
-            </Grid>
+                  <MultipleSelect
+                    formatacao={errors.aula && touched.aula ? inputConfig.selectError : inputConfig.select}
+                    aulas={aluno?.aula}
+                    arrayAulasSelecionadas={getAulas}
+                  />
+                  {errors.aula && touched.aula ? (
+                    <div style={inputConfig.errorText}>
+                      <p />
+                      * Selecione um curso
+                    </div>
+                  ) : null}
+                </div>
+                <div style={{ width: '44%' }}>
+                  <Typography sx={{ ml: 1, flex: 1 }}>
+                    Valor da mensalidade:
+                  </Typography>
+                  <Field
+                    name='aula.0.mensalidade'
+                  >
+                    {({ field }: any) => (
+                      <TextField
+                        {...field}
+                        value={valorMensal}
+                        onChange={() => setFieldValue(field.name, listaAulaSelecionada.at(0)?.mensalidade)}
+                        sx={inputConfig.inputConfigPequeno}
+                        name="numberformat"
+                        id="formatted-numberformat-input"
+                        InputProps={{
+                          inputComponent: Currency as any,
+                          disableUnderline: true
+                        }}
+                        variant="standard"
+                      />
+                    )}
+                  </Field>
+                </div>
+              </Grid>
 
-            <Box
-              textAlign={'end'}
-              sx={{
-                marginTop: 5,
-                marginRight: 7
-              }}
-            >
-              <Button
-                type='submit'
-                variant="contained"
+              <Box
+                textAlign={'end'}
                 sx={{
-                  backgroundColor: colorConfigs.title,
-                  color: "#fff",
-                  borderRadius: '10px',
+                  marginTop: 5,
+                  marginRight: 7
                 }}
               >
-                salvar
-              </Button>
-            </Box>
-          </Form>
-        )}
-      </Formik>
-      ): null }
+                <Button
+                  type='submit'
+                  variant="contained"
+                  sx={{
+                    backgroundColor: colorConfigs.title,
+                    color: "#fff",
+                    borderRadius: '10px',
+                  }}
+                >
+                  salvar
+                </Button>
+              </Box>
+            </Form>
+          )}
+        </Formik>
+      ) : null}
     </div>
   )
 }
